@@ -33626,3 +33626,7 @@ ValueError: Input contains NaN, infinity or a value too large for dtype('float64
 2021-11-04 12:36:03,670:INFO:Preloading libraries
 2021-11-04 13:18:33,540:INFO:Initializing load_model()
 2021-11-04 13:18:33,541:INFO:load_model(verbose=True, authentication=None, platform=None, model_name=sale_price_pred)
+2021-11-08 17:34:56,834:INFO:Initializing load_model()
+2021-11-08 17:34:56,842:INFO:load_model(verbose=True, authentication=None, platform=None, model_name=sale_price_pred)
+2021-11-08 17:36:21,838:INFO:Initializing load_model()
+2021-11-08 17:36:21,844:INFO:load_model(verbose=True, authentication=None, platform=None, model_name=sale_price_pred)

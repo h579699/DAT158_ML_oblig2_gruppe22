@@ -18,7 +18,7 @@ import os
 class StreamlitApp:
     
     def __init__(self):
-        self.model = load_model('model/sale_price_pred') 
+        self.model = load_model('sale_price_pred') 
         self.save_fn = 'predictions.csv'     
         
     def predict(self, input_data): 
@@ -67,7 +67,7 @@ class StreamlitApp:
             
     
     def run(self):
-        image = Image.open('images/for_sale.jpg')
+        image = Image.open('../images/for_sale.jpg')
         st.image(image, use_column_width=False)
     
     
