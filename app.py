@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[8]:
 
 
 from pycaret.regression import load_model, predict_model 
@@ -12,7 +12,7 @@ from PIL import Image
 import os
 
 
-# In[2]:
+# In[9]:
 
 
 class StreamlitApp:
@@ -35,7 +35,7 @@ class StreamlitApp:
             
     def preprocess(self, data):
    # Code from Flask-tutorial
-   # Makes sure all features are defined goint into the model?
+   # Makes sure all features are defined going into the model
     
         null = None
 
@@ -45,17 +45,17 @@ class StreamlitApp:
        'LandSlope':null, 'Neighborhood':null, 'Condition1':null, 'Condition2':null, 'BldgType':null,
        'HouseStyle':null, 'OverallQual':null, 'OverallCond':null, 'YearBuilt':null, 'YearRemodAdd':null,
        'RoofStyle':null, 'RoofMatl':null, 'Exterior1st':null, 'Exterior2nd':null, 'MasVnrType':null,
-       'MasVnrArea':null, 'ExterQual':null, 'ExterCond':null, 'Foundation':null, 'BsmtQual':null,
-       'BsmtCond':null, 'BsmtExposure':null, 'BsmtFinType1':null, 'BsmtFinSF1':null,
-       'BsmtFinType2':null, 'BsmtFinSF2':null, 'BsmtUnfSF':null, 'TotalBsmtSF':null, 'Heating':null,
-       'HeatingQC':null, 'CentralAir':null, 'Electrical':null, '1stFlrSF':null, '2ndFlrSF':null,
-       'LowQualFinSF':null, 'GrLivArea':null, 'BsmtFullBath':null, 'BsmtHalfBath':null, 'FullBath':null,
-       'HalfBath':null, 'BedroomAbvGr':null, 'KitchenAbvGr':null, 'KitchenQual':null,
-       'TotRmsAbvGrd':null, 'Functional':null, 'Fireplaces':null, 'FireplaceQu':null, 'GarageType':null,
-       'GarageYrBlt':null, 'GarageFinish':null, 'GarageCars':null, 'GarageArea':null, 'GarageQual':null,
-       'GarageCond':null, 'PavedDrive':null, 'WoodDeckSF':null, 'OpenPorchSF':null,
-       'EnclosedPorch':null, '3SsnPorch':null, 'ScreenPorch':null, 'PoolArea':null, 'PoolQC':null,
-       'Fence':null, 'MiscFeature':null, 'MiscVal':null, 'MoSold':null, 'YrSold':null, 'SaleType':null,
+       'MasVnrArea':0, 'ExterQual':null, 'ExterCond':null, 'Foundation':null, 'BsmtQual':null,
+       'BsmtCond':null, 'BsmtExposure':null, 'BsmtFinType1':null, 'BsmtFinSF1':0,
+       'BsmtFinType2':null, 'BsmtFinSF2':0, 'BsmtUnfSF':0, 'TotalBsmtSF':0, 'Heating':null,
+       'HeatingQC':null, 'CentralAir':null, 'Electrical':null, '1stFlrSF':0, '2ndFlrSF':0,
+       'LowQualFinSF':0, 'GrLivArea':null, 'BsmtFullBath':0, 'BsmtHalfBath':0, 'FullBath':1,
+       'HalfBath':0, 'BedroomAbvGr':null, 'KitchenAbvGr':1, 'KitchenQual':null,
+       'TotRmsAbvGrd':5, 'Functional':null, 'Fireplaces':0, 'FireplaceQu':null, 'GarageType':null,
+       'GarageYrBlt':null, 'GarageFinish':null, 'GarageCars':null, 'GarageArea':0, 'GarageQual':null,
+       'GarageCond':null, 'PavedDrive':null, 'WoodDeckSF':0, 'OpenPorchSF':0,
+       'EnclosedPorch':0, '3SsnPorch':0, 'ScreenPorch':0, 'PoolArea':0, 'PoolQC':null,
+       'Fence':null, 'MiscFeature':null, 'MiscVal':0, 'MoSold':null, 'YrSold':null, 'SaleType':null,
        'SaleCondition':null
         }
 
@@ -100,7 +100,7 @@ class StreamlitApp:
             exposure = ['Gd', 'Av', 'Mn', 'No']
             bsmtFinishLvl = ['GLQ', 'ALQ', 'BLQ', 'Rec', 'LwQ', 'Unf']
                             
-            totalBsmtSF = bsmtQual = bsmtCond = bsmtExposure = bsmtFT1 = bsmtFSF1 = bsmtFT2 = bsmtFSF2 = bsmtUSF = None
+            totalBsmtSF = bsmtQual = bsmtCond = bsmtExposure = bsmtFT1 = bsmtFSF1 = bsmtFT2 = bsmtFSF2 = bsmtUSF = bsmtFullBath = bsmtHalfBath = None
             if st.checkbox('Basement'):
                 totalBsmtSF = st.number_input('Total square feet of basement area', min_value=0)
                 bsmtQual = st.selectbox('Basement quality', qualCond,  format_func=lambda x: displayBsmtQual[qualCond.index(x)])
@@ -114,12 +114,15 @@ class StreamlitApp:
                 bsmtFSF1 = st.number_input('Type 1 finished square feet', min_value=0)
                 bsmtFSF2 = st.number_input('Type 2 finished square feet', min_value=0)
                 bsmtUSF = st.number_input('Unfinished square feet of basement area', min_value=0)
+                bsmtFullBath = st.number_input('Basement full bathrooms', min_value=0)
+                bsmtHalfBath = st.number_input('Basement half bathrooms', min_value=0)
             
              # Making display values for some of the garage features
             displayQualCond = ['Excellent', 'Good', 'Typical/Average', 'Fair', 'Poor']
             displayGarageFinish = ['Finished', 'Rough Finished', 'Unfinished']
             displayGarageTypes = ['More than one type of garage', 'Attached to home', 'Basement Garage', 
-                                  'Built-In (Garage part of house - typically has room above garage)', 'Car Port', 'Detached from home']
+                                  'Built-In (Garage part of house - typically has room above garage)', 'Car Port', 
+                                  'Detached from home']
             
             # Actual values of display values
             garageFinishLvl = ['Fin', 'RFn', 'Unf']
@@ -145,21 +148,52 @@ class StreamlitApp:
             yearBuilt = st.number_input('Original construction date', min_value=1300, max_value=2021, value=1990)
             yearAdd = st.number_input('Remodel data (same as construction date if no remodeling or additions',
                                       min_value=1300, max_value=2021, value=1990)
+            openPorchSF = st.number_input('Open porch area in square feet', min_value=0)
+            fullBath = st.number_input('Full bathrooms above grade', min_value=0)
+            halfBath = st.number_input('Half bathrooms above grade', min_value=0)
+            totRmsAbvGrd = st.number_input('Total rooms above grade (does not include bathrooms)', min_value=0)
+            bedrooms = st.number_input('Bedrooms above grade (does NOT include basement bedrooms)', min_value=0)
             
-            poolArea = poolQual = None
-            if st.checkbox('Pool'): 
-                poolQual = st.selectbox('Pool quality', qualCond, format_func=lambda x: displayQualCond[qualCond.index(x)])
-                poolArea = st.number_input('Pool area in square feet', min_value=0,)
+            displayNeighborhoods = ['Bloomington Heights', 'Bluestem', 'Briardale','Brookside','Clear Creek', 'College Creek',
+                                    'Crawford', 'Edwards', 'Gilbert', 'Iowa DOT and Rail Road', 'Meadow Village', 'Mitchell', 
+                                    'North Ames', 'Northridge', 'Northpark Villa', 'Northridge Heights', 'Nortwest Ames',
+                                    'Old Town', 'South & West of Iowa State University', 'Sawyer', 'Sawyer West', 'Somerset',
+                                    'Stone Brook', 'Timberland', ' Veenker']
+            neighborhoods = ['Blmngtn', 'Blueste', 'BrDale','BrkSide','ClearCr', 'CollgCr', 'Crawfor', 'Edwards', 'Gilbert',
+                             'IDOTRR', 'MeadowV', 'Mitchel', 'Names', 'NoRidge', 'NPkVill', 'NridgHt', 'NWAmes','OldTown',
+                             'SWISU', 'Sawyer', 'SawyerW', 'Somerst', 'StoneBr', 'Timber', ' Veenker']
+            
+            neighborhood = st.selectbox('Neighborhood', neighborhoods, 
+                                        format_func=lambda x: displayNeighborhoods[neighborhoods.index(x)])
+            
+            displayExterior = ['Asbestos Shingles','Asphalt Shingles', 'Brick Common','Brick Face', 'Cinder Block', 'Cement Board',
+                               'Hard Board', 'Imitation Stucco', 'Metal Siding', 'Other', 'Plywood','PreCast', 'Stone','Stucco',
+                               'Vinyl Siding','Wood Siding', 'Wood Shingles', 'Not available']
+            exterior = ['AsbShng','AsphShn','BrkComm','BrkFace','CBlock','CemntBd','HdBoard','ImStucc', 'MetalSd','Other','Plywood',
+                        'PreCast','Stone', 'Stucco', 'VinylSd', 'Wd Sdng', 'WdShing', None]
+            
+            exterior1 = st.selectbox('Exterior covering on house', exterior, 
+                                        format_func=lambda x: displayExterior[exterior.index(x)])
+            exterior2 = st.selectbox('Exterior covering on house (if more than one)', exterior, 
+                                        format_func=lambda x: displayExterior[exterior.index(x)])
+            exteriorQual = st.selectbox('Quality of material on the exterior', qualCond, format_func=lambda x: displayQualCond[qualCond.index(x)])
+            exteriorCond = st.selectbox('Condition of material on the exterior', qualCond,  format_func=lambda x: displayQualCond[qualCond.index(x)])
+            
+            
       
             
-            user_input = {'OverallQual': overallQual, 'OverallCond': overallCond, 'GrLivArea': grLivArea, 'TotalBsmtSF': totalBsmtSF, 
-                          'BsmtQual': bsmtQual,'BsmtCond': bsmtCond, 'BsmtExposure': bsmtExposure, 'BsmtFinType1': bsmtFT1, 
-                          'BsmtFinSF1': bsmtFSF1, 'BsmtFinType2': bsmtFT2, 'BsmtFinSF2': bsmtFSF2, 'BsmtUnfSF': bsmtUSF,
+            user_input = {'OverallQual': overallQual, 'OverallCond': overallCond, 'GrLivArea': grLivArea, 
+                          'TotalBsmtSF': totalBsmtSF, 'BsmtQual': bsmtQual,'BsmtCond': bsmtCond, 'BsmtExposure': bsmtExposure, 
+                          'BsmtFinType1': bsmtFT1, 'BsmtFinSF1': bsmtFSF1, 'BsmtFinType2': bsmtFT2, 'BsmtFinSF2': bsmtFSF2, 
+                          'BsmtUnfSF': bsmtUSF, 'BsmtFullBath': bsmtFullBath, 'BsmtHalfBath' : bsmtHalfBath,
                          'GarageType': garageType, 'GarageYrBlt': garageYrBlt, 'GarageFinish': garageFinish, 'GarageCars': garageCars,
                          'GarageArea': garageArea, 'GarageQual': garageQual, 'GarageCond': garageCond,
                          'KitchenAbvGr': kitchen, 'KitchenQual': kitchenQual, '1stFlrSF': fstFlrSF, '2ndFlrSF': sndFlrSF,
                          'LotArea': lotArea, 'LotFrontage': lotFrontage, 'YearBuilt': yearBuilt, 'YearRemodAdd': yearAdd,
-                         'PoolArea': poolArea, 'PoolQC': poolQual}
+                          'OpenPorchSF': openPorchSF, 'FullBath': fullBath, 'HalfBath': halfBath, 'TotRmsAbvGrd':totRmsAbvGrd,
+                          'BedroomAbvGr': bedrooms, 'Neighborhood': neighborhood, 'Exterior1st': exterior1, 'Exterior2nd':exterior2,
+                          'ExterQual': exteriorQual, 'ExterCond': exteriorCond
+                         }
             
             input_dict = self.preprocess(user_input)
             input_df = pd.DataFrame(input_dict, index=[0])
@@ -170,10 +204,10 @@ class StreamlitApp:
                 output = self.predict(input_df)
                 self.store_prediction(output)
                 
-                output = str(output['Label'])
+                output = output['Label'][0].round(2)
                 
             
-            st.success('Predicted output: {}'.format(output))
+            st.success('Predicted saleprice: {} dollars'.format(output))
             
         if add_selectbox == 'Batch': 
             fn = st.file_uploader("Upload csv file for predictions") #st.file_uploader('Upload csv file for predictions, type=["csv"]')
@@ -185,11 +219,4 @@ class StreamlitApp:
             
 sa = StreamlitApp()
 sa.run()
-
-
-# In[16]:
-
-
-
-
 
