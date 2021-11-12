@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[8]:
+# In[1]:
 
 
 from pycaret.regression import load_model, predict_model 
@@ -12,7 +12,7 @@ from PIL import Image
 import os
 
 
-# In[9]:
+# In[2]:
 
 
 class StreamlitApp:
@@ -34,11 +34,14 @@ class StreamlitApp:
             output_df.to_csv(self.save_fn, index=False)  
             
     def preprocess(self, data):
-   # Code from Flask-tutorial
-   # Makes sure all features are defined going into the model
+   # Preprocess method insipred by code from predict.py from the Flask-tutorial hospitalapp
+
+   # This method makes sure all features are defined going into the model
     
         null = None
-
+        
+        # Setting default values for some of the features, while letting the models imputation method deal with the other potentially 
+        # missing values (that are  not retrieved from user)
         feature_values = {
             'Id':null, 'MSSubClass': null, 'MSZoning': null, 'LotFrontage':null, 'LotArea':null, 'Street': null,
        'Alley': null, 'LotShape': null, 'LandContour':null, 'Utilities':null, 'LotConfig':null,
@@ -70,16 +73,15 @@ class StreamlitApp:
         image = Image.open('../images/for_sale.jpg')
         st.image(image, use_column_width=False)
     
-    
         add_selectbox = st.sidebar.selectbox('How would you like to predict?', ('Online', 'Batch'))  
         st.sidebar.info('This app is created to predict sale price of houses' )
         st.sidebar.success('DAT158 - Group 22 - Oblig 2')
-        st.title('Prediction of house sale prices')
+        st.title('Prediction of house saleprices')
         
-        # Since there are a lot of features in the dataset, I've limited the amount of user input while predicting online.
-        # The chosen features are based on the feature_importances of 
+        # The model is trained on 67 features. To get the best possible result from the online prediction, the group has chosen
+        # to include 66 of these as user inputs (exluding saleprice). The group tried experiementing with fewer features and using
+        # default values for the missing features, but the results were not as good as we wanted. 
         
-       
         if add_selectbox == 'Online': 
             overallQual = st.number_input('Overall Quality (1 = Low, 10 = Very Excellent)', min_value=1, max_value=10, value=5)
             overallCond = st.number_input('Overall Condition (1 = Low, 10 = Very Excellent)', min_value=1, max_value=10, value=5)
@@ -87,18 +89,18 @@ class StreamlitApp:
             
             # Making display values for some of the basement features
             displayBsmtQual = ['Excellent (100+ inches)', 'Good (90-99 inches)', 'Typical (80-89 inches)', 
-                   'Fair (70-79 inches)', 'Poor (<70 inches)']
+                   'Fair (70-79 inches)', 'Poor (<70 inches)', 'No basement']
             displayBsmtCond = ['Excellent', 'Good', 'Typical - slight dampness allowed', 
-                   'Fair - dampness or some cracking or settling', 'Poor - Severe cracking, settling, or wetness']
+                   'Fair - dampness or some cracking or settling', 'Poor - Severe cracking, settling, or wetness', 'No basement']
             displayExposure = ['Good Exposure', 'Average Exposure (split levels or foyers typically score average or above)',
-                               'Minimum Exposure', 'No Exposure']
+                               'Minimum Exposure', 'No Exposure', 'No basement']
             displayBsmtFinishLvl = ['Good Living Quarters', 'Average Living Quarters', 'Below Average Living Quarters',
-                                'Average Rec Room', 'Low Quality', 'Unfinished']
+                                'Average Rec Room', 'Low Quality', 'Unfinished', 'No basement']
             
             # Actual values of display values
-            qualCond = ['Ex', 'Gd', 'TA', 'Fa', 'Po']
-            exposure = ['Gd', 'Av', 'Mn', 'No']
-            bsmtFinishLvl = ['GLQ', 'ALQ', 'BLQ', 'Rec', 'LwQ', 'Unf']
+            qualCond = ['Ex', 'Gd', 'TA', 'Fa', 'Po', None]
+            exposure = ['Gd', 'Av', 'Mn', 'No', None]
+            bsmtFinishLvl = ['GLQ', 'ALQ', 'BLQ', 'Rec', 'LwQ', 'Unf', None]
                             
             totalBsmtSF = bsmtQual = bsmtCond = bsmtExposure = bsmtFT1 = bsmtFSF1 = bsmtFT2 = bsmtFSF2 = bsmtUSF = bsmtFullBath = bsmtHalfBath = None
             if st.checkbox('Basement'):
@@ -118,15 +120,15 @@ class StreamlitApp:
                 bsmtHalfBath = st.number_input('Basement half bathrooms', min_value=0)
             
              # Making display values for some of the garage features
-            displayQualCond = ['Excellent', 'Good', 'Typical/Average', 'Fair', 'Poor']
-            displayGarageFinish = ['Finished', 'Rough Finished', 'Unfinished']
+            displayQualCond = ['Excellent', 'Good', 'Typical/Average', 'Fair', 'Poor', 'Not available']
+            displayGarageFinish = ['Finished', 'Rough Finished', 'Unfinished', 'No garage']
             displayGarageTypes = ['More than one type of garage', 'Attached to home', 'Basement Garage', 
                                   'Built-In (Garage part of house - typically has room above garage)', 'Car Port', 
-                                  'Detached from home']
+                                  'Detached from home', 'No garage']
             
             # Actual values of display values
-            garageFinishLvl = ['Fin', 'RFn', 'Unf']
-            garageTypes = ['2Types', 'Attachd', 'Basment', 'BuiltIn', 'CarPort', 'Detchd']
+            garageFinishLvl = ['Fin', 'RFn', 'Unf', None]
+            garageTypes = ['2Types', 'Attachd', 'Basment', 'BuiltIn', 'CarPort', 'Detchd', None]
             
             garageType = garageYrBlt = garageFinish = garageCars = garageArea = garageQual = garageCond = None
             if st.checkbox('Garage'): 
@@ -139,16 +141,70 @@ class StreamlitApp:
                 garageQual = st.selectbox('Garage quality', qualCond, format_func=lambda x: displayQualCond[qualCond.index(x)])
                 garageCond = st.selectbox('Garage condition', qualCond,  format_func=lambda x: displayQualCond[qualCond.index(x)])
             
-            kitchen = st.number_input('Kitchens above grade', min_value=0, value=1)
+            # kitchen = st.number_input('Kitchens above grade', min_value=0, value=1) (not used in model)
             kitchenQual = st.selectbox('Kitchen Quality', qualCond, format_func=lambda x: displayQualCond[qualCond.index(x)])
             fstFlrSF = st.number_input('First floor square feet', min_value=0)
             sndFlrSF = st.number_input('Second floor square feet', min_value=0)
+                        
+            displayMSSubClass = ['1-story 1946 & newer all styles', '1-story 1945 & older', '1-story w/finished attic all ages',
+                                 '1-1/2 story - unfinished all ages', '1-1/2 story finished all ages', '2-story 1946 & newer',
+                                 '2-story 1945 & older', '2-1/2 story all ages', 'split or multi-level', 'split foyer',
+                                 'duplex - all styles and ages', '1-story planned unit development (PUD) - 1946 & newer', 
+                                 '1-1/2 story PUD - all ages', '2-story PUD - 1946 & newer', 'PUD multi level- incl split lev/foyer', 
+                                 '2 family conversion - all styles and ages']
+            MSSC_values = [20, 30, 40, 45, 50, 60, 70, 75, 80, 85, 90, 120, 150, 160, 180, 190]
+            
+            mssc = st.selectbox('Type of dwelling involved in the sale', MSSC_values, 
+                                format_func=lambda x: displayMSSubClass[MSSC_values.index(x)])
+           
+            displayMZS = ['Agriculture', 'Commercial', 'Floating Village Residental', 'Industrial',
+                          'Residential High Density', 'Residential Low Density', 'Residential Low Density Park ', 'Residential Medium Density']
+            MSZ_values = ['A', 'C', 'FV', 'I', 'RH', 'RL', 'RP', 'RM']
+            
+            MSZoning = st.selectbox('General zoning classification', MSZ_values, format_func=lambda x: displayMZS[MSZ_values.index(x)])
+            
             lotArea = st.number_input('Lot size in square feet', min_value=0)
             lotFrontage = st.number_input('Linear feet of street connected to property', min_value=0)
+                        
+            displayLot = ['Regular', 'Slightly irregular', 'Moderately Irregular', 'Irregular']
+            displayLndc = ['Near Flat/Level', 'Banked', 'Hillside', 'Depression']
+            displayLotC = ['Inside lot', 'Corner lot', 'Cul-de-sac', 'Frontage on 2 sides of property', 'Frontage on 3 sides of property']
+            displayLaslp = ['Gentle slope', 'Moderate Slope', 'Severe Slope']
+            
+            lot_values = ['Reg','IR1','IR2','IR3']
+            lndc_values = ['lvl', 'Bnk', 'HLS', 'Low']
+            lotc_values = ['Inside', 'Corner', ' CulDSac', 'FR2', 'FR3']
+            laslp_values = ['Gtl', 'Mod', 'Sev']
+            
+            lotShape = st.selectbox('General shape of property', lot_values, format_func=lambda x: displayLot[lot_values.index(x)])    
+            landContour = st.selectbox('Flatness of the property', lndc_values, format_func=lambda x: displayLndc[lndc_values.index(x)])
+            lotConfig = st.selectbox('Lot configuration', lotc_values, format_func=lambda x: displayLotC[lotc_values.index(x)])
+            landSlope = st.selectbox('Slope of property', laslp_values, format_func=lambda x: displayLaslp[laslp_values.index(x)])
+            
+            displayCond1 = ['Adjacent to arterial street', 'Adjacent to feeder street', 'Normal', 
+                            'Within 200 of North-South Railroad', 'Adjacent to North-South Railroad',
+                            'Near positive off-site feature--park, greenbelt, etc.', 'Adjacent to postive off-site feature',
+                            'Within 200 of East-West Railroad', 'Adjacent to East-West Railroad']
+            cond1_values = ['Artery', 'Feedr', 'Norm', 'RRNn', 'RRAn', 'PosN', 'PosA', 'RRNe', 'RRAe']
+            
+            cond1 = st.selectbox('Proximity to various conditions', cond1_values, format_func=lambda x: displayCond1[cond1_values.index(x)])
+            
+
+            displayBldgT= ['Single-family Detached', 'Two-family Conversion; originally built as one-family dwelling',
+                           'Duplex', 'Townhouse End Unit', 'Townhouse Inside Unit']
+            displayHost = ['One story', 'One and one-half story: 2nd level finished', 'One and one-half story: 2nd level unfinished',
+                           'Two story', 'Two and one-half story: 2nd level finished', 'Two and one-half story: 2nd level unfinished',
+                           'Split Foyer', 'Split Level']
+                                       
+            bldgT_values = ['1Fam', '2FmCon', 'Duplx', 'TwnhsE', 'TwnhsI']
+            host_values = ['1Story', '1.5Fin', '1.5Unf', '2Story', '2.5Fin', '2.5Unf', 'SFoyer', 'SLvl']
+                                       
+            bldgType = st.selectbox('Type of dwelling', bldgT_values, format_func=lambda x: displayBldgT[bldgT_values.index(x)])
+            houseStyle = st.selectbox('Style of dwelling', host_values, format_func=lambda x: displayHost[host_values.index(x)])
+                                               
             yearBuilt = st.number_input('Original construction date', min_value=1300, max_value=2021, value=1990)
             yearAdd = st.number_input('Remodel data (same as construction date if no remodeling or additions',
                                       min_value=1300, max_value=2021, value=1990)
-            openPorchSF = st.number_input('Open porch area in square feet', min_value=0)
             fullBath = st.number_input('Full bathrooms above grade', min_value=0)
             halfBath = st.number_input('Half bathrooms above grade', min_value=0)
             totRmsAbvGrd = st.number_input('Total rooms above grade (does not include bathrooms)', min_value=0)
@@ -176,24 +232,108 @@ class StreamlitApp:
                                         format_func=lambda x: displayExterior[exterior.index(x)])
             exterior2 = st.selectbox('Exterior covering on house (if more than one)', exterior, 
                                         format_func=lambda x: displayExterior[exterior.index(x)])
-            exteriorQual = st.selectbox('Quality of material on the exterior', qualCond, format_func=lambda x: displayQualCond[qualCond.index(x)])
-            exteriorCond = st.selectbox('Condition of material on the exterior', qualCond,  format_func=lambda x: displayQualCond[qualCond.index(x)])
+            exteriorQual = st.selectbox('Quality of material on the exterior', qualCond, 
+                                        format_func=lambda x: displayQualCond[qualCond.index(x)])
+            exteriorCond = st.selectbox('Condition of material on the exterior', qualCond,  
+                                        format_func=lambda x: displayQualCond[qualCond.index(x)])
             
+            displayFoundation = ['Brick & Tile', 'Cinder Block', 'Poured Concrete', 'Slab', 'Stone', 'Wood']
+            foundationValues = ['BrkTil', 'CBlock', 'PConc', 'Slab', 'Stone', 'Wood']
             
+            foundation = st.selectbox('Type of foundation', foundationValues,  
+                                        format_func=lambda x: displayFoundation[foundationValues.index(x)])
+            
+            displaySaleType = ['Warranty Deed - Conventional', 'Warranty Deed - Cash', 'Warranty Deed - VA Loan','Home just constructed and sold', 
+                               'Court Officer Deed/Estate', 'Contract 15% Down payment regular terms', 'Contract Low Down payment and low interest', 
+                               'Contract Low Interest', 'Contract Low Down', 'Other']
+            displaySaleCond = ['Normal Sale', 'Abnormal Sale', 'Adjoining Land Purchase', 
+                               'Allocation - two linked properties with separate deeds, typically condo with a garage unit',
+                               'Sale between family members','Home was not completed when last assessed (associated with New Homes)']
+            
+            saletypes = ['WD', 'CWD', 'VWD', 'New', 'COD', 'Con', 'ConLw', 'ConLI', 'ConLD', 'Oth']
+            saleconditions = ['Normal', 'Abnorml', 'AdjLand', 'Alloca', 'Family', 'Partial']
+            
+            saleType = st.selectbox('Type of sale', saletypes, 
+                                        format_func=lambda x: displaySaleType[saletypes.index(x)])
+            saleCond = st.selectbox('Condition of sale', saleconditions, 
+                                        format_func=lambda x: displaySaleCond[saleconditions.index(x)])
+            
+            yearSold = st.number_input('Year Sold (YYYY)', min_value=1300, max_value=2021, value=2000)
+            moSold = st.number_input('Month Sold (M)', min_value=1, max_value=12)
+  
+            displayFence = ['Good Privacy', 'Minimum Privacy', 'Good Wood', 'Minimum Wood/Wire', 'No fence']
+            displayPD = ['Paved', 'Partial Pavement', 'Dirt/Gravel']
+            
+            fenceTypes = ['GdPrv', 'MnPrv', 'GdWo', 'MnWw', None]
+            PDvalues = ['Y', 'P', 'N']
+            
+            fence = st.selectbox('Fence quality', fenceTypes, 
+                                format_func=lambda x: displayFence[fenceTypes.index(x)])
+            pavedDrive = st.selectbox('Paved driveway', PDvalues, 
+                                format_func=lambda x: displayPD[PDvalues.index(x)])
       
+            
+            woodDeckSF = st.number_input('Wood deck area in square feet', min_value=0)
+            openPorchSF = st.number_input('Open porch area in square feet', min_value=0)
+            enclosedPorch = st.number_input('Enclosed porch area in square feet', min_value=0)
+            screenPorch = st.number_input('Screen porch area in square feet', min_value=0)
+            
+            displayFPQual = ['Excellent - Exceptional Masonry Fireplace','Good - Masonry Fireplace in main level',
+                             'Average - Prefabricated Fireplace in main living area or Masonry Fireplace in basement',
+                             'Fair - Prefabricated Fireplace in basement', 'Poor - Ben Franklin Stove', 'No Fireplace']
+            
+            fireplaces = st.number_input('Number of fireplaces', min_value=0)
+            fireplaceQual = None
+            if fireplaces > 0:
+                fireplaceQual = st.selectbox('Fireplace quality', qualCond, format_func=lambda x: displayFPQual[qualCond.index(x)])
+            
+            displayFunctional = ['Typical Functionality', 'Minor deductions 1', 'Minor deductions 2', 'Moderate deductions',
+                                 'Major deductions 1', 'Major deductions 2', 'Severely damaged', 'Salvage only']
+            displayElectrical = ['Standard Circuit Breakers & Romex', 'Fuse Box over 60 AMP and all Romex wiring (Average)',
+                                 '60 AMP Fuse Box and mostly Romex wiring (Fair)',
+                                 '60 AMP Fuse Box and mostly knob & tube wiring (Poor)', 'Mixed']
+            
+            functionalValues = ['Typ', 'Min1', 'Min2', 'Mod', 'Maj1', 'Maj2', 'Sev', 'Sal']
+            electricalValues = ['SBrkr','FuseA','FuseF', 'FuseP', 'Mix']
+            
+            functional = st.selectbox('Home functionality (Assume typical unless deductions are warranted)', functionalValues, 
+                                      format_func=lambda x: displayFunctional[functionalValues.index(x)])
+            electrical = st.selectbox('Electrical system', electricalValues, 
+                                      format_func=lambda x: displayElectrical[electricalValues.index(x)])
+            heatingQC = st.selectbox('Heating quality and condition', qualCond, format_func=lambda x: displayQualCond[qualCond.index(x)])
+            
+            centralAir = 'N'
+            if st.checkbox('Central air conditioning'):
+                centralAir = 'Y' 
+                
+            displayRoofs = ['Flat', 'Gable', 'Gabrel (Barn)', 'Hip', 'Mansard', 'Shed']
+            roofs_values = ['Flat', 'Gable', 'Gambrel', 'Hip', 'Mansard', 'Shed']
+            roofStyle = st.selectbox('Type of rood', roofs_values, format_func=lambda x: displayRoofs[roofs_values.index(x)])
+            
+            displayMasVT = ['Brick Common', 'Brick Face', 'Cinder Block', 'None', 'Stone']
+            masVT_values = ['BrkCmn', 'BrkFace', 'CBlock', 'None', 'Stone']
+            masVnrType = st.selectbox('Masonry veneer type', masVT_values, format_func=lambda x: displayMasVT[masVT_values.index(x)])
+            masVnrArea = st.number_input('Masonry veneer area in square feet', min_value=0)
             
             user_input = {'OverallQual': overallQual, 'OverallCond': overallCond, 'GrLivArea': grLivArea, 
                           'TotalBsmtSF': totalBsmtSF, 'BsmtQual': bsmtQual,'BsmtCond': bsmtCond, 'BsmtExposure': bsmtExposure, 
                           'BsmtFinType1': bsmtFT1, 'BsmtFinSF1': bsmtFSF1, 'BsmtFinType2': bsmtFT2, 'BsmtFinSF2': bsmtFSF2, 
                           'BsmtUnfSF': bsmtUSF, 'BsmtFullBath': bsmtFullBath, 'BsmtHalfBath' : bsmtHalfBath,
-                         'GarageType': garageType, 'GarageYrBlt': garageYrBlt, 'GarageFinish': garageFinish, 'GarageCars': garageCars,
-                         'GarageArea': garageArea, 'GarageQual': garageQual, 'GarageCond': garageCond,
-                         'KitchenAbvGr': kitchen, 'KitchenQual': kitchenQual, '1stFlrSF': fstFlrSF, '2ndFlrSF': sndFlrSF,
-                         'LotArea': lotArea, 'LotFrontage': lotFrontage, 'YearBuilt': yearBuilt, 'YearRemodAdd': yearAdd,
-                          'OpenPorchSF': openPorchSF, 'FullBath': fullBath, 'HalfBath': halfBath, 'TotRmsAbvGrd':totRmsAbvGrd,
+                          'GarageType': garageType, 'GarageYrBlt': garageYrBlt, 'GarageFinish': garageFinish, 'GarageCars': garageCars,
+                          'GarageArea': garageArea, 'GarageQual': garageQual, 'GarageCond': garageCond,
+                          'KitchenQual': kitchenQual, '1stFlrSF': fstFlrSF, '2ndFlrSF': sndFlrSF,'Fence':fence, 
+                          'LotArea': lotArea, 'LotFrontage': lotFrontage, 'YearBuilt': yearBuilt, 'YearRemodAdd': yearAdd,
+                          'FullBath': fullBath, 'HalfBath': halfBath, 'TotRmsAbvGrd':totRmsAbvGrd, 'HeatingQC':heatingQC,
                           'BedroomAbvGr': bedrooms, 'Neighborhood': neighborhood, 'Exterior1st': exterior1, 'Exterior2nd':exterior2,
-                          'ExterQual': exteriorQual, 'ExterCond': exteriorCond
+                          'ExterQual': exteriorQual, 'ExterCond': exteriorCond, 'SaleType': saleType, 'SaleCondition': saleCond, 
+                          'MoSold':moSold, 'YrSold':yearSold, 'MSSubClass': mssc, 'MSZoning': MSZoning, 'LotShape': lotShape,
+                          'LandContour': landContour, 'LotConfig': lotConfig, 'LandSlope':landSlope, 'Condition1': cond1, 
+                          'BldgType': bldgType, 'HouseStyle':houseStyle, 'PavedDrive':pavedDrive, 'Foundation': foundation,
+                          'WoodDeckSF':woodDeckSF, 'OpenPorchSF':openPorchSF, 'EnclosedPorch': enclosedPorch, 'ScreenPorch': screenPorch,
+                          'Fireplaces': fireplaces, 'FireplaceQu': fireplaceQual, 'Functional': functional, 'Electrical': electrical,
+                          'CentralAir':centralAir, 'masVnrType':masVnrType, 'MasVnrArea': masVnrArea, 'RoofStyle': roofStyle
                          }
+            
             
             input_dict = self.preprocess(user_input)
             input_df = pd.DataFrame(input_dict, index=[0])

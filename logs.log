@@ -628,3 +628,89 @@
                                  n_jobs=-1)]]))
 2021-11-09 19:15:38,321:INFO:Checking exceptions
 2021-11-09 19:15:38,321:INFO:Preloading libraries
+2021-11-12 17:46:35,759:INFO:Initializing load_model()
+2021-11-12 17:46:35,760:INFO:load_model(verbose=True, authentication=None, platform=None, model_name=model/sale_price_pred)
+2021-11-12 17:48:20,233:INFO:Initializing load_model()
+2021-11-12 17:48:20,233:INFO:load_model(verbose=True, authentication=None, platform=None, model_name=model/sale_price_pred)
+2021-11-12 17:48:26,840:INFO:Initializing load_model()
+2021-11-12 17:48:26,840:INFO:load_model(verbose=True, authentication=None, platform=None, model_name=model/sale_price_pred)
+2021-11-12 17:48:27,111:INFO:Initializing predict_model()
+2021-11-12 17:48:27,111:INFO:predict_model(display=None, ml_usecase=MLUsecase.REGRESSION, verbose=True, round=4, raw_score=False, encoded_labels=True, probability_threshold=None, estimator=Pipeline(steps=[('dtypes',
+                 DataTypes_Auto_infer(categorical_features=['MSZoning',
+                                                            'LotShape',
+                                                            'LandContour',
+                                                            'LotConfig',
+                                                            'LandSlope',
+                                                            'Neighborhood',
+                                                            'Condition1',
+                                                            'BldgType',
+                                                            'HouseStyle',
+                                                            'RoofStyle',
+                                                            'Exterior1st',
+                                                            'Exterior2nd',
+                                                            'MasVnrType',
+                                                            'ExterQual',
+                                                            'ExterCond',
+                                                            'Foundation',
+                                                            'BsmtQual',
+                                                            'BsmtCond',
+                                                            'BsmtExposure',
+                                                            'BsmtFinType1',
+                                                            'BsmtFinType2',
+                                                            'HeatingQC',...
+                ('clean_names', Clean_Colum_Names()),
+                ('feature_select', 'passthrough'), ('fix_multi', 'passthrough'),
+                ('dfs', 'passthrough'), ('pca', 'passthrough'),
+                ['trained_model',
+                 VotingRegressor(estimators=[('gbr',
+                                              GradientBoostingRegressor(random_state=123)),
+                                             ('lightgbm',
+                                              LGBMRegressor(random_state=123)),
+                                             ('par',
+                                              PassiveAggressiveRegressor(random_state=123)),
+                                             ('huber', HuberRegressor())],
+                                 n_jobs=-1)]]))
+2021-11-12 17:48:27,115:INFO:Checking exceptions
+2021-11-12 17:48:27,116:INFO:Preloading libraries
+2021-11-12 17:48:40,513:INFO:Initializing load_model()
+2021-11-12 17:48:40,514:INFO:load_model(verbose=True, authentication=None, platform=None, model_name=model/sale_price_pred)
+2021-11-12 17:48:49,719:INFO:Initializing load_model()
+2021-11-12 17:48:49,720:INFO:load_model(verbose=True, authentication=None, platform=None, model_name=model/sale_price_pred)
+2021-11-12 17:48:49,911:INFO:Initializing predict_model()
+2021-11-12 17:48:49,912:INFO:predict_model(display=None, ml_usecase=MLUsecase.REGRESSION, verbose=True, round=4, raw_score=False, encoded_labels=True, probability_threshold=None, estimator=Pipeline(steps=[('dtypes',
+                 DataTypes_Auto_infer(categorical_features=['MSZoning',
+                                                            'LotShape',
+                                                            'LandContour',
+                                                            'LotConfig',
+                                                            'LandSlope',
+                                                            'Neighborhood',
+                                                            'Condition1',
+                                                            'BldgType',
+                                                            'HouseStyle',
+                                                            'RoofStyle',
+                                                            'Exterior1st',
+                                                            'Exterior2nd',
+                                                            'MasVnrType',
+                                                            'ExterQual',
+                                                            'ExterCond',
+                                                            'Foundation',
+                                                            'BsmtQual',
+                                                            'BsmtCond',
+                                                            'BsmtExposure',
+                                                            'BsmtFinType1',
+                                                            'BsmtFinType2',
+                                                            'HeatingQC',...
+                ('clean_names', Clean_Colum_Names()),
+                ('feature_select', 'passthrough'), ('fix_multi', 'passthrough'),
+                ('dfs', 'passthrough'), ('pca', 'passthrough'),
+                ['trained_model',
+                 VotingRegressor(estimators=[('gbr',
+                                              GradientBoostingRegressor(random_state=123)),
+                                             ('lightgbm',
+                                              LGBMRegressor(random_state=123)),
+                                             ('par',
+                                              PassiveAggressiveRegressor(random_state=123)),
+                                             ('huber', HuberRegressor())],
+                                 n_jobs=-1)]]))
+2021-11-12 17:48:49,914:INFO:Checking exceptions
+2021-11-12 17:48:49,914:INFO:Preloading libraries
