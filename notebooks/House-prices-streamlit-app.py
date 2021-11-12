@@ -141,7 +141,6 @@ class StreamlitApp:
                 garageQual = st.selectbox('Garage quality', qualCond, format_func=lambda x: displayQualCond[qualCond.index(x)])
                 garageCond = st.selectbox('Garage condition', qualCond,  format_func=lambda x: displayQualCond[qualCond.index(x)])
             
-            # kitchen = st.number_input('Kitchens above grade', min_value=0, value=1) (not used in model)
             kitchenQual = st.selectbox('Kitchen Quality', qualCond, format_func=lambda x: displayQualCond[qualCond.index(x)])
             fstFlrSF = st.number_input('First floor square feet', min_value=0)
             sndFlrSF = st.number_input('Second floor square feet', min_value=0)
@@ -350,7 +349,7 @@ class StreamlitApp:
             st.success('Predicted saleprice: {} dollars'.format(output))
             
         if add_selectbox == 'Batch': 
-            fn = st.file_uploader("Upload csv file for predictions") #st.file_uploader('Upload csv file for predictions, type=["csv"]')
+            fn = st.file_uploader("Upload csv file for predictions")
             if fn is not None: 
                 input_df = pd.read_csv(fn)
                 predictions = self.predict(input_df)
